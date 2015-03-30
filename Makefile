@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-Wall -std=c++11
+FLAGS=-Wall
 OBJECT= obj/main.o
 SRC=src/
 PROG_NAME=ecs608-cw2
