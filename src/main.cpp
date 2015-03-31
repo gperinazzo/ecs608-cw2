@@ -204,5 +204,5 @@ int main(int argc, char* argv[])
 			else if (i != j) totalUnknown++;
 
 	// Print the results
-	std::cout << totalLess << " " << totalUnknown << std::flush;
+	std::cout << totalLess << " " << totalUnknown << std::endl;
 }
