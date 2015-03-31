@@ -26,6 +26,8 @@ declare -a ARGS
 
 NUM_E=128
 
+mkdir -p data
+
 for NUM_E in `seq $MIN_E $STEP_E $MAX_E`
 do
 	NUM_T=$MIN_T
@@ -50,7 +52,7 @@ do
 
 				# Launch processes
 				echo ${ARGS[@]} ">" ${ARGS[0]}.${ARGS[1]}.${ARGS[2]}.out
-				./run_aux.sh ${ARGS[@]} $R > ${ARGS[0]}.${ARGS[1]}.${ARGS[2]}.out &
+				./run_aux.sh ${ARGS[@]} $R > data/${ARGS[0]}.${ARGS[1]}.${ARGS[2]}.out &
 				PIDS[$_i]=$!
 
 			done
