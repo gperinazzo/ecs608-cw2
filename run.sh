@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Commented values are the values used for the experiment
+
 # Processes simultaneously
 N=4				# 8
 # Number of times each case is executed
