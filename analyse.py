@@ -8,33 +8,83 @@ import pprint
 import re
 import sys
 
-from matplotlib import pyplot
+from matplotlib import pyplot as pp
 from matplotlib.backends.backend_pdf import PdfPages
 
 
-def draw_graph(title, file, data):
+def draw_all(title, file, data):
+    # Save Graphs on PDF
+    f_ = os.path.join('graphs', file)
+    p = PdfPages(f_)
+
+    _keys = list(data.keys())
+    _keys.sort()
+
+    # Plot data
+    for k in _keys:
+        pp.plot(data[k]['i'], data[k]['<'], label=('known (' + str(k) + ')'))
+        pp.plot(data[k]['i'], data[k]['||'], label=('unknown (' + str(k) +
+                                                    ')'))
+
+    pp.legend(loc=0)
+
+    # Set title
+    pp.title(title)
+    pp.xlabel('Number of Communications')
+    pp.ylabel('Number of Relations')
+
+    pp.savefig(p, format='pdf')
+    pp.close()
+    p.close()
+    # pyplot.show()
+
+
+def draw_ratio(title, file, data):
+    # Save Graphs on PDF
+    f_ = os.path.join('graphs', file)
+    p = PdfPages(f_)
+
+    _keys = list(data.keys())
+    _keys.sort()
+
+    # Plot data
+    for k in _keys:
+        pp.plot(data[k]['i'], data[k]['r'], label=(str(k) + ' threads'))
+
+    pp.legend(loc=0)
+
+    # Set title
+    pp.title(title)
+    pp.xlabel('Number of Communications')
+    pp.ylabel('Ratio of Known Relations')
+
+    pp.savefig(p, format='pdf')
+    pp.close()
+    p.close()
+    # pyplot.show()
+
+
+def draw(title, file, data):
     # Save Graphs on PDF
     f_ = os.path.join('graphs', file)
     p = PdfPages(f_)
 
     # Plot data
-    for k in data.keys():
-        pyplot.plot(data[k]['i'], data[k]['<'], label=('known (' + str(k) +
-                                                       ')'))
-        pyplot.plot(data[k]['i'], data[k]['||'], label=('unknown (' + str(k) +
-                                                        ')'))
+    pp.plot(data['i'], data['<'], label='known')
+    pp.plot(data['i'], data['||'], label='unknown')
 
-    pyplot.legend(loc=0)
+    pp.legend(loc=0)
 
     # Set title
-    pyplot.title(title)
-    pyplot.xlabel('Number of Philosopher')
-    pyplot.ylabel('Number of Tries')
+    pp.title(title)
+    pp.xlabel('Number of Communications')
+    pp.ylabel('Number of Relations')
 
-    pyplot.savefig(p, format='pdf')
-    pyplot.close()
+    pp.savefig(p, format='pdf')
+    pp.close()
     p.close()
     # pyplot.show()
+
 
 # Regular expression to get information from data filename
 p = re.compile('(?P<events>\d+)\.(?P<threads>\d+)\.(?P<messages>\d+)\.out')
@@ -90,20 +140,19 @@ gdata = {}
 for e in data.keys():
     gdata[e] = {}
     for t, m in data[e].keys():
-        gdata[e][t] = {'<': [], '||': [], 'i': []}
+        gdata[e][t] = {'<': [], '||': [], 'i': [], 'r': []}
 
         # pprint.pprint(data[e])
         # print(t, m, data[e][(t, m)], data[e].get((t, m)))
 
         for m_ in ind:
-            print(m, m_)
             x = data[e].get((t, m_))
-            print(x)
             if x is None:
                 continue
             gdata[e][t]['<'].append(x['<'])
             gdata[e][t]['||'].append(x['||'])
             gdata[e][t]['i'].append(m_)
+            gdata[e][t]['r'].append(x['<'] / (x['<'] + x['||']))
 
 
 pprint.pprint(gdata)
@@ -114,4 +163,9 @@ matplotlib.rc('font', **{'family': 'sans-serif', 'size': '14.0',
                          'sans-serif': ['Computer Modern Sans serif']})
 
 for e in data.keys():
-    draw_graph(str(e) + ' events', str(e) + '.pdf', gdata[e])
+    draw_all(str(e) + ' events', str(e) + '.pdf', gdata[e])
+    draw_ratio(str(e) + ' events', str(e) + '.ratio.pdf', gdata[e])
+    for t in gdata[e].keys():
+        title = str(e) + ' events with ' + str(t) + ' threads'
+        filename = str(e) + '.' + str(t) + '.pdf'
+        draw(title, filename, gdata[e][t])
